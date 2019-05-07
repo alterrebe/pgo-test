@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-import os, psycopg2, random, string
+import os, psycopg2, random, string, time
 
 
 RO_DB_ENDPOINT = os.environ['RO_DB_ENDPOINT']
@@ -31,7 +31,7 @@ def get_connection(mode):
 
 def do_sql(mode, name=None):
 	retries = 3
-	for attempt in range(5):
+	for attempt in range(3):
 		try:
 			conn = get_connection(mode)
 			cur = conn.cursor()
@@ -52,6 +52,7 @@ def do_sql(mode, name=None):
 
 		except Exception as e:
 			print("Got error in %s : %s" % (mode, str(e)))
+			time.sleep(3)
 
 
 i=0
@@ -65,7 +66,7 @@ while True:
 		mode = 'read'
 		result = do_sql(mode)
 
-	if i % 101 == 0:
+	if i % 101 == 0 and result != None:
 		print("SQL mode %s, result = %d" % (mode, result))
 
 	i = i + 1

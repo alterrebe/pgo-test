@@ -3,21 +3,13 @@
 import os, psycopg2, random, string
 
 
-DB_NAME = os.environ['PGDATABASE']
-DB_USER = os.environ['PGUSER']
-DB_PASS = os.environ['PGPASSWORD']
 RO_DB_ENDPOINT = os.environ['RO_DB_ENDPOINT']
 RW_DB_ENDPOINT = os.environ['RW_DB_ENDPOINT']
 
-
-def open_connection(endpoint):
-	return psycopg2.connect( host=endpoint, dbname=DB_NAME, user=DB_USER, password=DB_PASS)
-
-
 if os.environ['PERSIST_CONNECTION'] == 'yes':
 	PERSIST_CONNECTION = True
-	RO_CONN = open_connection(RO_DB_ENDPOINT)
-	RW_CONN = open_connection(RW_DB_ENDPOINT)
+	RO_CONN = psycopg2.connect(host=RO_DB_ENDPOINT)
+	RW_CONN = psycopg2.connect(host=RW_DB_ENDPOINT)
 else:
 	PERSIST_CONNECTION = False
 
@@ -33,9 +25,9 @@ def get_connection(mode):
 	elif PERSIST_CONNECTION and mode == 'write':
 		return RW_CONN
 	elif not PERSIST_CONNECTION and mode == 'read':
-		return open_connection(RO_DB_ENDPOINT)
+		return psycopg2.connect(host=RO_DB_ENDPOINT)
 	elif not PERSIST_CONNECTION and mode == 'write':
-		return open_connection(RW_DB_ENDPOINT)
+		return psycopg2.connect(host=RW_DB_ENDPOINT)
 
 def do_sql(mode, name=None):
 	retries = 3

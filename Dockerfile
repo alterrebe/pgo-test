@@ -5,6 +5,7 @@ RUN apt-get update -qq && \
     apt-get install -qqy postgresql-client && \
     pip3 install psycopg2
 
+COPY db-schema.sql /db-schema.sql
 COPY run.py /run.py
 
 ENTRYPOINT [ "/run.py" ]
